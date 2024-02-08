@@ -1,7 +1,7 @@
 from enum import Enum
 
-import adbRoot
-from adbRoot import ADBroot
+import adb_root
+from adb_root import ADBroot
 
 
 class BlueArchive(ADBroot.ADBTask):
@@ -10,15 +10,15 @@ class BlueArchive(ADBroot.ADBTask):
         CN = 2
         Global_zhHant = 3
 
-    def __init__(self, adb_root, server: Server):
-        super().__init__(adb_root)
+    def __init__(self, adb_root_instance, server: Server):
+        super().__init__(adb_root_instance)
         if server == self.Server.JP:
-            self.adb_root.logger.critical("JP server is not supported yet.")
+            self.adb_root_instance.logger.critical("JP server is not supported yet.")
         elif server == self.Server.CN:
             self.package_name = "com.RoamingStar.bluearchive"
         else:
             self.package_name = "com.nexon.bluearchive"
         self.activity_name = "MxUnityPlayerActivity"
 
-        self.meta_tasks.put(adbRoot.end_execute)
+        self.meta_tasks.put(adb_root.end_execute)
 

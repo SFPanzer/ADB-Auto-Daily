@@ -11,28 +11,28 @@ import utils
 
 class ADBroot:
     class ADBTask(object):
-        def __init__(self, adb_root):
-            self.adb_root: ADBroot = adb_root
+        def __init__(self, adb_root_instance):
+            self.adb_root_instance: ADBroot = adb_root_instance
             self.package_name = ""
             self.activity_name = ""
             self.meta_tasks = queue.Queue()
 
         def _start(self):
-            self.adb_root.execute(["shell", "am", "start", "-n", f"{self.package_name}/.{self.activity_name}"])
+            self.adb_root_instance.execute(["shell", "am", "start", "-n", f"{self.package_name}/.{self.activity_name}"])
 
         def _stop(self):
-            self.adb_root.execute(["shell", "am", "force-stop", f"{self.package_name}"])
+            self.adb_root_instance.execute(["shell", "am", "force-stop", f"{self.package_name}"])
 
         def launch(self):
             self._start()
             while True:
                 func = self.meta_tasks.get()
                 try:
-                    self.adb_root.logger.info(f"Execute meta-task {func.__name__}...")
+                    self.adb_root_instance.logger.info(f"Execute meta-task {func.__name__}...")
                     func()
-                    self.adb_root.logger.info(f"Meta-task {func.__name__} finished.")
+                    self.adb_root_instance.logger.info(f"Meta-task {func.__name__} finished.")
                 except StopIteration:
-                    self.adb_root.logger.info(f"All meta-task of {self.__class__.__name__} has been finished.")
+                    self.adb_root_instance.logger.info(f"All meta-task of {self.__class__.__name__} has been finished.")
                     break
             self._stop()
 
@@ -58,15 +58,6 @@ class ADBroot:
         else:
             self.logger.critical("Unable to connect to device.")
             exit(-1)
-
-        # Power up and Unlock phone.
-        self.execute(["shell", "input", "keyevent", "KEYCODE_WAKEUP"])
-        dreaming_lock_screen = self.execute(["shell", "dumpsys", "window", "|", "grep", "mDreamingLockscreen"])
-        if "mDreamingLockscreen=true" in dreaming_lock_screen:
-            self.execute(["shell", "input", "text", self.adb_config["unlock_password"]])
-            self.execute(["shell", "input", "keyevent", "66"])
-
-        # Go to home page.
 
         self.tasks = queue.Queue()
         self.task_exec_thread = threading.Thread(target=self._launch)

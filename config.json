@@ -1,8 +1,7 @@
 {
   "adb":{
     "terminal_encoding": "utf-8",
-    "adb_path": "adb",
-    "unlock_password": "YOUR_PHONE_UNLOCK_PASSWORD_HERE"
+    "adb_path": "adb"
   },
   "logging_config": {
     "version": 1,
@@ -25,7 +24,7 @@
       }
     },
     "root": {
-      "level": "INFO",
+      "level": "DEBUG",
       "handlers": ["file_handler", "console"]
     }
   }
