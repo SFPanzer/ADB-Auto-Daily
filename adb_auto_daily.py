@@ -1,4 +1,4 @@
-import adbRoot
+import adb_root
 from tasks.blue_archive.BlueArchive import BlueArchive
 
 if __name__ == '__main__':

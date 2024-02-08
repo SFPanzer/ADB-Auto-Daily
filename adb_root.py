@@ -67,7 +67,6 @@ class ADBroot:
             self.execute(["shell", "input", "keyevent", "66"])
 
         # Go to home page.
-        self.execute(["shell", "input", "keyevent", "KEYCODE_HOME"])
 
         self.tasks = queue.Queue()
         self.task_exec_thread = threading.Thread(target=self._launch)
