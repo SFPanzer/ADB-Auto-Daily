@@ -2,9 +2,8 @@ import json
 import logging
 import queue
 import threading
-import time
 import subprocess
-from abc import abstractmethod
+from ppadb.client import Client as AdbClient
 
 import utils
 
@@ -18,10 +17,10 @@ class ADBroot:
             self.meta_tasks = queue.Queue()
 
         def _start(self):
-            self.adb_root_instance.execute(["shell", "am", "start", "-n", f"{self.package_name}/.{self.activity_name}"])
+            self.adb_root_instance.execute(f"am start -n {self.package_name}/.{self.activity_name}")
 
         def _stop(self):
-            self.adb_root_instance.execute(["shell", "am", "force-stop", f"{self.package_name}"])
+            self.adb_root_instance.execute(f"am force-stop {self.package_name}")
 
         def launch(self):
             self._start()
@@ -42,20 +41,12 @@ class ADBroot:
         utils.setup_logging()
         self.logger = logging.getLogger('ADB-Auto-Daily')
 
-        # init abd
-        version = self.execute(["version"])
-        if len(version) < 30:
-            self.logger.critical("Can not launch adb")
-            exit(-1)
-        for i in range(3):
-            try:
-                self.devices = self.execute(["devices"]).split("\n")[1]
-            except IndexError:
-                self.logger.warning(f"Device not found. ({i + 1}/3)")
-                time.sleep(5)
-                continue
-            break
-        else:
+        # init ADB
+        self.logger.debug(subprocess.call(["adb", "start-server"]))
+        self.client = AdbClient(host="127.0.0.1", port=5037)
+        try:
+            self.device = self.client.devices()[0]
+        except IndexError:
             self.logger.critical("Unable to connect to device.")
             exit(-1)
 
@@ -63,11 +54,11 @@ class ADBroot:
         self.task_exec_thread = threading.Thread(target=self._launch)
         self.task_exec_thread.start()
 
-    def execute(self, args: list) -> str:
-        output = subprocess.check_output([self.adb_config["adb_path"]] + args)
-        output = output.decode(self.adb_config["terminal_encoding"])
-        self.logger.debug(f"exec: {args}\n{output}".strip())
-        return output
+    def execute(self, cmd: str) -> str:
+        self.logger.debug(f"Executing shell {cmd}...")
+        result = self.device.shell(cmd)
+        self.logger.debug(result)
+        return result
 
     def screenshot(self):
         with open("screenshot.png", "bw") as file:

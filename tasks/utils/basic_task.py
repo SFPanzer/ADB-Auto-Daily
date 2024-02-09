@@ -10,11 +10,8 @@ class Unlock(adb_root.ADBroot.ADBTask):
         super().__init__(adb_root_instance)
 
     def launch(self):
-        self.adb_root_instance.execute(["shell", "input", "keyevent", "KEYCODE_WAKEUP"])
-        dreaming_lock_screen = self.adb_root_instance.execute(
-            ["shell", "dumpsys", "window", "|", "grep", "mDreamingLockscreen"])
+        self.adb_root_instance.execute("input keyevent KEYCODE_WAKEUP")
+        dreaming_lock_screen = self.adb_root_instance.execute("dumpsys window | grep mDreamingLockscreen")
         if "mDreamingLockscreen=true" in dreaming_lock_screen:
-            self.adb_root_instance.execute(
-                ["shell", "input", "text", os.environ.get("UNLOCK_PASSWORD")])
-            self.adb_root_instance.execute(
-                ["shell", "input", "keyevent", "66"])
+            self.adb_root_instance.execute(f"input text {os.environ.get('UNLOCK_PASSWORD')}")
+            self.adb_root_instance.execute("input keyevent 66")
