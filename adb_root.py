@@ -3,9 +3,12 @@ import logging
 import queue
 import threading
 import subprocess
-from ppadb.client import Client as AdbClient
 
-import utils
+from ppadb.client import Client as AdbClient
+import numpy as np
+import cv2
+
+from utils import utils
 
 
 class ADBroot:
@@ -60,10 +63,11 @@ class ADBroot:
         self.logger.debug(result)
         return result
 
-    def screenshot(self):
-        with open("screenshot.png", "bw") as file:
-            file.write(subprocess.check_output(["adb", "shell", "screencap", "-p"]))
-            self.logger.debug("Screenshot taken.")
+    def screencap(self):
+        image_byte_array = self.device.screencap()
+        screenshot = cv2.imdecode(np.fromstring(bytes(image_byte_array), np.uint8), cv2.IMREAD_COLOR)
+        self.logger.debug("Screenshot taken.")
+        return screenshot
 
     def _launch(self):
         while True:
