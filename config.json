@@ -3,6 +3,9 @@
     "terminal_encoding": "utf-8",
     "adb_path": "adb"
   },
+  "image_logging_config": {
+    "backupCount": 16
+  },
   "logging_config": {
     "version": 1,
     "formatters": {
@@ -12,10 +15,12 @@
     },
     "handlers": {
       "file_handler": {
-        "class": "logging.FileHandler",
+        "class": "logging.handlers.RotatingFileHandler",
         "level": "DEBUG",
         "formatter": "simple",
-        "filename": "application.log"
+        "filename": "./logs/application.log",
+        "maxBytes": 1048576,
+        "backupCount": 3
       },
       "console": {
         "class": "logging.StreamHandler",

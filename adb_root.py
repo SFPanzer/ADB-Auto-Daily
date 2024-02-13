@@ -8,7 +8,8 @@ from ppadb.client import Client as AdbClient
 import numpy as np
 import cv2
 
-from utils import utils
+import utils.log_system
+from utils import log_system
 
 
 class ADBroot:
@@ -41,7 +42,7 @@ class ADBroot:
     def __init__(self):
         with open("config.json") as config_file:
             self.adb_config = json.load(config_file)["adb"]
-        utils.setup_logging()
+        utils.log_system.setup_logging()
         self.logger = logging.getLogger('ADB-Auto-Daily')
 
         # init ADB
@@ -60,7 +61,9 @@ class ADBroot:
     def execute(self, cmd: str) -> str:
         self.logger.debug(f"Executing shell {cmd}...")
         result = self.device.shell(cmd)
-        self.logger.debug(result)
+        result = str(result).strip()
+        if len(result):
+            self.logger.debug(f">> {result}")
         return result
 
     def screencap(self):

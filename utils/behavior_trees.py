@@ -61,7 +61,7 @@ class ActionNode(IBehaviorNode):
 
 class BehaviorTree(object):
     def __init__(self):
-        self.root: IBehaviorNode = SequenceNode()
+        self.root: SequenceNode = SequenceNode()
         self.blackboard: dict = {}
 
     def exec(self):
